@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "aiogram3course"
+version = "0.1.0"
+description = ""
+authors = ["AlPetrovv <sanya10081999@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+aiogram = "^3.15.0"
+environs = "^11.2.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
