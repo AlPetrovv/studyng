@@ -1,6 +1,9 @@
-__doc__ = """Schemas of serialization data for users."""
+__doc__ = """Schemas of serialization data for users. Smth like serializers in Django"""
 
-from pydantic import BaseModel, EmailStr, Field
+
+from pydantic import EmailStr  # pydantic {email} package
+from pydantic import BaseModel
+from pydantic import Field
 from typing import Annotated
 from annotated_types import MaxLen, MinLen
 
@@ -15,13 +18,13 @@ class CreateUser(BaseModel):
     ВАЖНО: ... - показывают что поле обязательное!
     Field - пока не понятно, но используется для pydantic моделей, в нем есть встроенная валидация
 
-    username: Annotated[str,MinLen(3),MaxLen(20),] другой метод валидации полей
+    username: Annotated[str, MinLen(3), MaxLen(20)] другой метод валидации полей
     """
 
     email: EmailStr
-    # username: str = Field(..., max_digits=3, max_length=20)
+    # username: str = Field(..., max_digits=3, max_length=20)  # first way
     username: Annotated[
         str,
         MinLen(3),
         MaxLen(20),
-    ]
+    ]  # second way

@@ -1,5 +1,6 @@
-from fastapi import FastAPI
 import uvicorn
+
+from fastapi import FastAPI
 from items.views import router as items_router
 from users.views import router as users_router
 
