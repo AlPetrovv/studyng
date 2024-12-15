@@ -1,0 +1,28 @@
+version: "3.9"
+
+services:
+  django:
+    build: ./core
+    container_name: django4course-django
+    env_file:
+      - envs/django.env
+      - envs/postgres.env
+    expose:
+      - "8000"
+    command: ["python", "manage.py", "runserver", "8000"]
+#    volumes:
+    user: app
+
+  postgres:
+    image: postgres:16.5-alpine
+    container_name: django4course-postgres
+    ports:
+      - "5432:${POSTGRES_PORT}"
+    volumes:
+      - django4course-data:/var/lib/postgresql/data
+    env_file:
+      - envs/postgres.env
+
+
+volumes:
+  django4course-data:
