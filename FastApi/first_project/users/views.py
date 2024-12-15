@@ -1,4 +1,5 @@
 from fastapi.routing import APIRouter  # router for api
+
 from . import crud  # for crud operations
 from .schemas import CreateUser  # create user schema
 

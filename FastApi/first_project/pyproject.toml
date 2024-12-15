@@ -14,10 +14,20 @@ pydantic = {extras = ["email"], version = "^2.8.2"}
 sqlalchemy = {extras = ["asyncio"], version = "^2.0.32"}
 aiosqlite = "^0.20.0"
 pydantic-settings = "^2.6.1"
+isort = "^5.13.2"
+flake8 = "^7.1.1"
+alembic = "^1.14.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.3.2"
 black = "^24.8.0"
+
+[tool.isort]
+profile = "black"
+default_section = "THIRDPARTY"
+sections = "FUTURE,STDLIB,THIRDPARTY,FIRSTPARTY,LOCALFOLDER"
+force_single_line = "True"
+line_length = 119
 
 [build-system]
 requires = ["poetry-core"]

@@ -1,12 +1,15 @@
 import uvicorn
-
 from fastapi import FastAPI
+
+from api.v1 import router as api_v1_router
 from items.views import router as items_router
+from setup import lifespan
 from users.views import router as users_router
 
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
 app.include_router(items_router)
 app.include_router(users_router)
+app.include_router(api_v1_router)
 
 
 @app.get("/")
@@ -26,4 +29,4 @@ def add(a: int, b: int):
 
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", reload=True)
+    uvicorn.run("main:app", reload=True, port=8001)
