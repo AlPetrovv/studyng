@@ -6,7 +6,7 @@ from pathlib import Path
 from pydantic_settings import BaseSettings
 from pydantic_settings import SettingsConfigDict
 
-BASE_DIR = Path(__file__).parent.parent  # first_project
+BASE_DIR = Path(__file__).parent.parent  # microshop-project
 
 
 class Status(BaseSettings):
