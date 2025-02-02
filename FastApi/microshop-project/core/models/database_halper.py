@@ -1,4 +1,3 @@
-# sqlalchemy.ext -
 from asyncio import current_task
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -28,7 +27,7 @@ class DBHalper:
             expire_on_commit=False,
         )
 
-    def get_engine(self):
+    def get_connection(self):
         with self.engine.begin() as conn:
             return conn
 
@@ -71,6 +70,6 @@ class DBHalper:
 
 
 db_helper = DBHalper(
-    db_url=settings.db_url,
-    echo=settings.db_echo,
+    db_url=settings.db_settings.url,
+    echo=settings.db_settings.echo,
 )
