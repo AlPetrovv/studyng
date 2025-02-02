@@ -1,6 +1,8 @@
 import os
 from pathlib import Path
 
+from pydantic import BaseModel
+
 #
 # Base class for settings
 from pydantic_settings import BaseSettings
@@ -9,33 +11,38 @@ from pydantic_settings import SettingsConfigDict
 BASE_DIR = Path(__file__).parent.parent  # microshop-project
 
 
+DB_PATH = BASE_DIR / "shop.sqlite3"
+
+
 class Status(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=os.path.join(BASE_DIR, "core/envs/status.env")
     )
 
 
+class DBSettings(BaseModel):
+    url: str = f"sqlite+aiosqlite:///{DB_PATH}"
+    echo: bool = True
+
+
 class Settings(BaseSettings):
     """Can load env file"""
 
     api_v1_prefix: str = "/api/v1"
-    db_url: str = f"sqlite+aiosqlite:///{BASE_DIR}/shop.sqlite3"
     debug: bool = False
-    db_echo: bool = False
+    db_settings: DBSettings = DBSettings()
 
 
 class DevSettings(BaseSettings):
     api_v1_prefix: str = "/api/v1"
-    db_url: str = f"sqlite+aiosqlite:///{BASE_DIR}/shop.sqlite3"
     debug: bool = True
-    db_echo: bool = True
+    db_settings: DBSettings = DBSettings()
 
 
 class TestSettings(BaseSettings):
     api_v1_prefix: str = "/api/v1"
-    db_url: str = f"sqlite+aiosqlite:///{BASE_DIR}/shop_test.sqlite3"
     debug: bool = False
-    db_echo: bool = False
+    db_settings: DBSettings = DBSettings()
 
 
 # status_settings = Status()
