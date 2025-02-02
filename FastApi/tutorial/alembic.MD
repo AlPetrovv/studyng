@@ -11,4 +11,7 @@
    * upgrade all migrations to the last migration
 4. alembic downgrade -1 
    * alembic downgrade - return migration 
-   * -1 -> return to 1 migration 
+   * -1 -> return to 1 migration
+5. alembic current -> show current migration
+6. alembic history -> show all migrations
+7. alembic downgrade base -> downgrade all migrations
