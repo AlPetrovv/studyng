@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 
 # different between default and server_default
 # default - use value when create obj by sqlalchemy
-# server_default - default for postgresql
+# server_default - default for database
 # Mapped - not nullable if not use null like default
 
 
@@ -29,5 +29,11 @@ class Post(UserRelationMixin, Base):
     body: Mapped[str] = mapped_column(
         Text,
         default="",  # default for alchemy
-        server_default="",  # default in postgresql
+        server_default="",  # default for database
     )
+
+    def __str__(self):
+        return f"{self.__class__.__name__}: id={self.id}, user={self.user_id}"
+
+    def __repr__(self):
+        return str(self)
