@@ -1,10 +1,12 @@
 import asyncio
+from collections.abc import AsyncGenerator
 
 from sqlalchemy import select, Result, ScalarResult
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload, selectinload
 
-from core.models import db_helper, User, Post, Profile
+from core.models import OrderItemAssociation
+from core.models import db_helper, User, Post, Profile, Order, Item
 
 
 async def create_user(session: AsyncSession, username: str) -> User:
@@ -128,14 +130,134 @@ async def main_relations(session: AsyncSession):
     await get_profiles_with_users_and_users_with_posts(session)
 
 
+async def create_order(
+    session: AsyncSession,
+    promocode: str | None = None,
+) -> Order:
+    order = Order(promocode=promocode)
+    session.add(order)
+    await session.commit()
+    print(order)
+    return order
+
+
+async def create_item(
+    session: AsyncSession,
+    name: str,
+    description: str,
+    price: int,
+) -> Item:
+    item = Item(
+        name=name,
+        description=description,
+        price=price,
+    )
+    session.add(item)
+    await session.commit()
+    print(item)
+    return item
+
+
+async def get_order_by_id(session: AsyncSession, order_id: int) -> Order:
+    order = await session.scalar(
+        select(Order).options(selectinload(Order.items)).where(Order.id == order_id)
+    )
+    return order
+
+
+async def add_items_to_order(
+    order: int | Order,
+    items: list[Item],
+):
+    if isinstance(order, int):
+        order = (
+            select(Order).options(selectinload(Order.items)).where(Order.id == order)
+        )
+
+    order.items.extend(items)
+
+
+async def create_order_with_items(session: AsyncSession):
+    order1 = await create_order(session, "code1")
+    order2 = await create_order(session, "code2")
+    order3 = await create_order(session)
+
+    item1 = await create_item(session, name="Bread", description="Food", price=10)
+    item2 = await create_item(session, name="Soup", description="Alchemy", price=30)
+    item3 = await create_item(session, name="Mouse", description="PC", price=100)
+
+    order1 = await get_order_by_id(session, order_id=order1.id)
+    order2 = await get_order_by_id(session, order_id=order2.id)
+    order3 = await get_order_by_id(session, order_id=order3.id)
+
+    await add_items_to_order(order=order1, items=[item1, item2])
+    await add_items_to_order(order=order2, items=[item2])
+    await add_items_to_order(order=order3, items=[item3, item1, item2])
+
+    await session.commit()
+
+
+async def get_orders_with_items(session: AsyncSession) -> AsyncGenerator:
+    """
+    function that yield orders with items (m2m relation)
+    """
+    stmt = select(Order).options(selectinload(Order.items)).order_by(Order.id)
+    orders: ScalarResult[Order] = await session.scalars(stmt)
+    for order in orders:  # type: Order
+        yield order
+
+
+async def get_orders_with_items_with_assoc(session: AsyncSession) -> AsyncGenerator:
+    smtm = (
+        select(Order)
+        .options(
+            selectinload(Order.items_details).joinedload(OrderItemAssociation.item),
+        )
+        .order_by(Order.id)
+    )
+    orders = await session.scalars(smtm)
+
+    for order in orders:
+        yield order
+
+
+async def demo_m2m(session: AsyncSession):
+    """
+    demo examples m2m relation
+    """
+    # async for order in get_orders_with_items_with_assoc(session):  # type: Order
+    #     print("".center(50, "*"))
+    #     print(f" Order id:{order.id}, Order created at:{order.created_at}")
+    #     print("Items:")
+    #     for item_details in order.items_details:  # type: OrderItemAssociation
+    #         print(
+    #             f"Item id: {item_details.id},  Item name: {item_details.item.name}, Item price: {item_details.item.price}"
+    #         )
+
+
+async def create_gift_items_for_exists_order(session: AsyncSession):
+    orders = get_orders_with_items_with_assoc(session=session)
+
+    gift_item = await create_item(
+        session,
+        name="Gift",
+        description="Gift",
+        price=0,
+    )
+
+    async for order in orders:
+        print("".center(50, "*"))
+        order.items_details.append(
+            OrderItemAssociation(count=1, unit_price=10, item=gift_item)
+        )
+
+    await session.commit()
+
+
 async def main():
     async with db_helper.session_factory() as session:  # type: AsyncSession
         # await main_relations(session)
-        await demo_m2m()
-
-
-async def demo_m2m():
-    pass
+        await demo_m2m(session)
 
 
 if __name__ == "__main__":

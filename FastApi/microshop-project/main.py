@@ -1,10 +1,10 @@
 import uvicorn
 from fastapi import FastAPI
+from setup import lifespan
 
 from api.v1 import router as api_v1_router
-from items.views import router as items_router
-from setup import lifespan
-from users.views import router as users_router
+from old.items.views import router as items_router
+from old.users.views import router as users_router
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(items_router)
